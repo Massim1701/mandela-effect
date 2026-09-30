@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandela Effekt – Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090b;--card:#18181b;--card2:#27272a;--border:#3f3f46;
+  --primary:#a855f7;--primary-dim:#7c3aed;
+  --text:#fafafa;--muted:#a1a1aa;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--cyan:#06b6d4;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh}
+.screen{display:none}
+.screen.active{display:block}
+
+/* LOGIN */
+#s-login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+#s-login.active{display:flex}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:420px}
+.login-title{font-size:1.5rem;font-weight:700;margin-bottom:8px}
+.login-sub{color:var(--muted);font-size:.9rem;margin-bottom:32px}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:8px}
+input[type=text],input[type=password]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:inherit;font-size:1rem;outline:none;transition:border-color .2s}
+input:focus{border-color:var(--primary)}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:1rem;font-weight:600;transition:all .2s;margin-top:16px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dim)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.login-err{color:var(--red);font-size:.85rem;margin-top:12px;display:none}
+
+/* DASHBOARD */
+#s-dash{min-height:100vh;padding:24px;max-width:1100px;margin:0 auto}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.dash-title{font-size:1.3rem;font-weight:700}
+.dash-title span{color:var(--primary)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:600}
+.badge-waiting{background:#27272a;color:var(--muted)}
+.badge-voting{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-results{background:rgba(59,130,246,.15);color:var(--blue)}
+.badge-summary{background:rgba(168,85,247,.15);color:var(--primary)}
+.logout-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:inherit;font-size:.85rem;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+.dash-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+
+/* LEFT COLUMN */
+.pair-info{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.pair-num{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+.pair-title{font-size:1.4rem;font-weight:700;margin-bottom:6px}
+.pair-desc{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+.pair-imgs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.thumb{border-radius:10px;overflow:hidden;border:2px solid var(--border)}
+.thumb img{width:100%;height:140px;object-fit:cover;display:block}
+.thumb-label{padding:8px 10px;font-size:.85rem;font-weight:600;background:var(--card2);text-align:center}
+
+.controls{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.ctrl-title{font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em}
+.ctrl-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--card2);color:var(--text);font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;transition:all .2s;text-align:left}
+.ctrl-btn:hover:not(:disabled){background:#3f3f46;border-color:var(--muted)}
+.ctrl-btn:disabled{opacity:.35;cursor:not-allowed}
+.ctrl-btn.primary{background:rgba(168,85,247,.15);border-color:var(--primary);color:var(--primary)}
+.ctrl-btn.primary:hover:not(:disabled){background:rgba(168,85,247,.25)}
+.ctrl-btn.green{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.ctrl-btn.green:hover:not(:disabled){background:rgba(34,197,94,.2)}
+.ctrl-btn .icon{font-size:1.3rem;flex-shrink:0}
+.ctrl-btn .label{flex:1}
+.ctrl-btn .sub{font-size:.75rem;color:var(--muted);font-weight:400}
+
+.nav-row{display:flex;gap:10px}
+.nav-btn{flex:1;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s}
+.nav-btn:hover:not(:disabled){background:#3f3f46;color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* RIGHT COLUMN */
+.stats-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.stat-big{font-size:2.5rem;font-weight:700;color:var(--primary)}
+.stat-label{color:var(--muted);font-size:.85rem}
+.vote-progress{background:var(--card2);border-radius:8px;height:10px;overflow:hidden;margin-bottom:16px}
+.vote-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary-dim),var(--primary));transition:width .5s ease;border-radius:8px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center}
+.split-item{background:var(--card2);border-radius:10px;padding:12px}
+.split-num{font-size:1.5rem;font-weight:700}
+.split-label{font-size:.75rem;color:var(--muted);margin-top:2px}
+.split-pct{font-size:.85rem;font-weight:600;margin-top:4px}
+.col-left{color:#a78bfa}
+.col-right{color:#22d3ee}
+.live-badge{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--green);margin-bottom:16px}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+.prog-title{font-size:.85rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.prog-steps{display:flex;flex-wrap:wrap;gap:6px}
+.step{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:1px solid var(--border);color:var(--muted);background:var(--card2);cursor:pointer;transition:all .2s}
+.step:hover{border-color:var(--muted)}
+.step.done{background:rgba(168,85,247,.2);border-color:var(--primary);color:var(--primary)}
+.step.current{background:var(--primary);border-color:var(--primary);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+  <div class="login-box">
+    <div style="font-size:2rem;margin-bottom:16px">🧠</div>
+    <div class="login-title">Admin-Bereich</div>
+    <div class="login-sub">Mandela Effekt – Präsentation</div>
+    <label for="token-in">Admin-Token</label>
+    <input type="password" id="token-in" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" onclick="doLogin()">Anmelden</button>
+    <div class="login-err" id="login-err">Ungültiger Token.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="s-dash">
+  <div class="dash-header">
+    <div>
+      <div class="dash-title">Mandela <span>Effekt</span> – Admin</div>
+      <div id="phase-badge" class="badge badge-waiting" style="margin-top:6px">● Wartend</div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Abmelden</button>
+  </div>
+
+  <div class="dash-grid">
+    <!-- LEFT -->
+    <div>
+      <div class="pair-info">
+        <div class="pair-num" id="d-pair-num">Beispiel 1 von 20</div>
+        <div class="pair-title" id="d-title">–</div>
+        <div class="pair-desc" id="d-desc">–</div>
+        <div class="pair-imgs">
+          <div class="thumb">
+            <img id="d-img-left" src="https://placehold.co/400x280/18181b/3f3f46?text=Bild+A" alt="">
+            <div class="thumb-label" id="d-lbl-left">Version A</div>
+          </div>
+          <div class="thumb">
+            <img id="d-img-right" src="https://placehold.co/400x280/18181b/3f3f46?text=Bild+B" alt="">
+            <div class="thumb-label" id="d-lbl-right">Version B</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl-title">Steuerung</div>
+        <button class="ctrl-btn primary" id="btn-vote" onclick="doPhase('voting')">
+          <span class="icon">▶</span>
+          <span class="label">Voting starten<br><span class="sub">Publikum kann jetzt abstimmen</span></span>
+        </button>
+        <button class="ctrl-btn" id="btn-result" onclick="doPhase('results')" disabled>
+          <span class="icon">📊</span>
+          <span class="label">Auswertung zeigen<br><span class="sub">Ergebnis für dieses Beispiel</span></span>
+        </button>
+        <button class="ctrl-btn green" id="btn-next" onclick="doNext()" disabled>
+          <span class="icon">➡</span>
+          <span class="label">Nächstes Beispiel<br><span class="sub">Weiter zum nächsten Bild-Paar</span></span>
+        </button>
+        <button class="ctrl-btn" id="btn-summary" onclick="doPhase('summary')" disabled>
+          <span class="icon">🏁</span>
+          <span class="label">Gesamtauswertung<br><span class="sub">Alle Ergebnisse anzeigen</span></span>
+        </button>
+        <div class="nav-row" style="margin-top:16px">
+          <button class="nav-btn" id="btn-prev" onclick="doNavigate(-1)">◀ Zurück</button>
+          <button class="nav-btn" id="btn-fwd" onclick="doNavigate(1)">Vor ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="stats-card">
+        <div class="live-badge"><div class="live-dot"></div>Live-Stimmen</div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-big" id="d-vote-count">0</div>
+            <div class="stat-label">Stimmen für dieses Beispiel</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:1.2rem;font-weight:700;color:var(--muted)" id="d-vote-total">/ 30</div>
+            <div class="stat-label">erwartet</div>
+          </div>
+        </div>
+        <div class="vote-progress"><div class="vote-progress-fill" id="d-prog" style="width:0%"></div></div>
+        <div class="split">
+          <div class="split-item">
+            <div class="split-num col-left" id="d-left-count">0</div>
+            <div class="split-label" id="d-left-lbl">Links</div>
+            <div class="split-pct col-left" id="d-left-pct">0%</div>
+          </div>
+          <div class="split-item">
+            <div class="split-num col-right" id="d-right-count">0</div>
+            <div class="split-label" id="d-right-lbl">Rechts</div>
+            <div class="split-pct col-right" id="d-right-pct">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="prog-title">Fortschritt</div>
+        <div class="prog-steps" id="prog-steps"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://mgvjyyzurobcffulqyia.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ndmp5eXp1cm9iY2ZmdWxxeWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDE3NDIsImV4cCI6MjEwNjM3Nzc0Mn0.PQwuSNJAohKL_l3rSS_VJZPMNnVGJYck0ccxkETbo2w';
+const TOKENS = ['mdl-Admin-7Kp2XqNr','mdl-Admin-W4mLt8Fs','mdl-Admin-Z6hNe1Yx'];
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let pairs = [], state = null, refreshTimer = null;
+const seenPairs = new Set();
+
+function doLogin() {
+  const t = document.getElementById('token-in').value.trim();
+  const err = document.getElementById('login-err');
+  if (TOKENS.includes(t)) {
+    err.style.display = 'none';
+    document.getElementById('s-login').classList.remove('active');
+    document.getElementById('s-dash').classList.add('active');
+    initDash();
+  } else {
+    err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  document.getElementById('s-dash').classList.remove('active');
+  document.getElementById('s-login').classList.add('active');
+  document.getElementById('token-in').value = '';
+  clearInterval(refreshTimer);
+}
+
+async function initDash() {
+  const { data: p } = await sb.from('image_pairs').select('*').order('order_num');
+  pairs = p || [];
+  const { data: st } = await sb.from('presentation_state').select('*').eq('id', 1).single();
+  applyState(st);
+  buildSteps();
+
+  sb.channel('admin_state').on('postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 'presentation_state' },
+    p => applyState(p.new)
+  ).subscribe();
+
+  sb.channel('admin_votes').on('postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'votes' },
+    () => refreshStats()
+  ).subscribe();
+
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(refreshStats, 3000);
+}
+
+function applyState(st) {
+  state = st;
+  const pair = pairs[st.current_pair_index];
+  if (!pair) return;
+
+  if (st.phase !== 'waiting') seenPairs.add(st.current_pair_index);
+  buildSteps();
+
+  document.getElementById('d-pair-num').textContent = `Beispiel ${st.current_pair_index + 1} von ${pairs.length}`;
+  document.getElementById('d-title').textContent = pair.title;
+  document.getElementById('d-desc').textContent = pair.description;
+  document.getElementById('d-img-left').src = pair.image_left_url;
+  document.getElementById('d-img-right').src = pair.image_right_url;
+  document.getElementById('d-lbl-left').textContent = pair.left_label;
+  document.getElementById('d-lbl-right').textContent = pair.right_label;
+  document.getElementById('d-left-lbl').textContent = pair.left_label;
+  document.getElementById('d-right-lbl').textContent = pair.right_label;
+
+  const phase = st.phase;
+  const badges = {waiting:'badge-waiting ● Wartend',voting:'badge-voting ● Abstimmung läuft',results:'badge-results ● Auswertung',summary:'badge-summary ● Gesamtauswertung'};
+  const [cls, txt] = badges[phase].split(' ');
+  const pb = document.getElementById('phase-badge');
+  pb.className = `badge ${cls}`;
+  pb.textContent = txt;
+
+  document.getElementById('btn-vote').disabled = phase === 'summary';
+  document.getElementById('btn-result').disabled = phase !== 'voting';
+  document.getElementById('btn-next').disabled = !(phase === 'results');
+  document.getElementById('btn-summary').disabled = phase !== 'results';
+  document.getElementById('btn-prev').disabled = st.current_pair_index === 0;
+  document.getElementById('btn-fwd').disabled = st.current_pair_index >= pairs.length - 1;
+
+  refreshStats();
+}
+
+async function refreshStats() {
+  if (!state) return;
+  const pair = pairs[state.current_pair_index];
+  if (!pair) return;
+  const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pair.id);
+  const total = data?.length || 0;
+  const left = data?.filter(v => v.voted_side === 'left').length || 0;
+  const right = total - left;
+  const maxVotes = 30;
+  const lp = total ? Math.round(left / total * 100) : 0;
+  const rp = 100 - lp;
+  document.getElementById('d-vote-count').textContent = total;
+  document.getElementById('d-prog').style.width = `${Math.min(100, total / maxVotes * 100)}%`;
+  document.getElementById('d-left-count').textContent = left;
+  document.getElementById('d-right-count').textContent = right;
+  document.getElementById('d-left-pct').textContent = `${lp}%`;
+  document.getElementById('d-right-pct').textContent = `${rp}%`;
+}
+
+async function updateDB(updates) {
+  await sb.from('presentation_state').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', 1);
+}
+
+function doPhase(phase) {
+  updateDB({ phase });
+}
+
+async function doNext() {
+  const nextIdx = state.current_pair_index + 1;
+  if (nextIdx >= pairs.length) {
+    await updateDB({ phase: 'summary' });
+  } else {
+    await updateDB({ phase: 'voting', current_pair_index: nextIdx });
+  }
+}
+
+async function doNavigate(dir) {
+  const nextIdx = state.current_pair_index + dir;
+  if (nextIdx < 0 || nextIdx >= pairs.length) return;
+  await updateDB({ phase: 'waiting', current_pair_index: nextIdx });
+}
+
+function buildSteps() {
+  const wrap = document.getElementById('prog-steps');
+  wrap.innerHTML = '';
+  pairs.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'step' + (state?.current_pair_index === i ? ' current' : seenPairs.has(i) ? ' done' : '');
+    d.textContent = i + 1;
+    d.onclick = async () => {
+      if (state?.current_pair_index !== i) await updateDB({ phase: 'waiting', current_pair_index: i });
+    };
+    wrap.appendChild(d);
+  });
+}
+</script>
+</body>
+</html>

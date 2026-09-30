@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandela Effekt – Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090b;--card:#18181b;--border:#3f3f46;
+  --primary:#a855f7;--primary-dim:#7c3aed;
+  --text:#fafafa;--muted:#a1a1aa;
+  --green:#22c55e;--red:#ef4444;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow:hidden}
+.screen{display:none;position:fixed;inset:0;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.screen.active{display:flex}
+
+/* WAITING */
+#s-waiting{background:radial-gradient(ellipse at center,#1a0a2e 0%,#09090b 70%)}
+.wait-logo{font-size:clamp(2rem,6vw,4rem);font-weight:700;letter-spacing:-.02em;text-align:center;line-height:1.1}
+.wait-logo span{color:var(--primary)}
+.wait-sub{margin-top:16px;color:var(--muted);font-size:1.1rem;text-align:center}
+.pulse-ring{width:120px;height:120px;border:2px solid var(--primary);border-radius:50%;margin:40px auto;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.15);opacity:.3}}
+.inner-ring{width:80px;height:80px;border:2px solid var(--primary-dim);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 2s ease-in-out infinite .5s}
+.ring-wrap{position:relative;width:120px;height:120px;margin:40px auto}
+
+/* VOTING */
+#s-voting{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
+.vote-header{text-align:center;width:100%;max-width:1200px;margin-bottom:24px}
+.pair-counter{color:var(--primary);font-size:.9rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.vote-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin:8px 0}
+.vote-desc{color:var(--muted);font-size:1rem}
+.images-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:1200px;flex:1}
+.img-card{background:var(--card);border:2px solid var(--border);border-radius:16px;cursor:pointer;overflow:hidden;transition:all .2s ease;position:relative}
+.img-card:hover:not(.voted):not(.disabled){border-color:var(--primary);transform:translateY(-4px);box-shadow:0 8px 40px rgba(168,85,247,.3)}
+.img-card.selected{border-color:var(--primary);box-shadow:0 0 0 4px rgba(168,85,247,.3)}
+.img-card.other{opacity:.5;transform:none}
+.img-card.disabled{cursor:default}
+.img-card img{width:100%;height:380px;object-fit:cover;display:block}
+.img-label{padding:16px;font-size:1rem;font-weight:600;text-align:center}
+.voted-badge{position:absolute;top:12px;right:12px;background:var(--primary);color:#fff;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:999px}
+.vote-status{margin-top:16px;color:var(--muted);text-align:center;font-size:.95rem}
+.live-count{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:8px 16px;border-radius:999px;margin-top:8px}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* RESULTS */
+#s-results{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
+.result-header{text-align:center;width:100%;max-width:900px;margin-bottom:32px}
+.result-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin:8px 0}
+.result-sub{color:var(--muted)}
+.result-imgs{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:900px;margin-bottom:24px}
+.result-card{background:var(--card);border:2px solid var(--border);border-radius:16px;overflow:hidden;position:relative}
+.result-card img{width:100%;height:280px;object-fit:cover;display:block;opacity:.7}
+.result-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 60%)}
+.result-pct{font-size:2.5rem;font-weight:700;color:#fff}
+.result-votes{font-size:.9rem;color:var(--muted)}
+.result-lbl{font-size:.95rem;font-weight:600;color:#fff;margin-top:4px}
+.result-bar-wrap{width:100%;max-width:900px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;height:48px;position:relative}
+.result-bar{height:100%;transition:width 1s ease;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.bar-left{background:linear-gradient(90deg,#7c3aed,#a855f7);position:absolute;left:0;top:0;bottom:0}
+.bar-right{background:linear-gradient(90deg,#0891b2,#06b6d4);position:absolute;right:0;top:0;bottom:0}
+.total-info{margin-top:16px;color:var(--muted);text-align:center;font-size:.9rem}
+
+/* SUMMARY */
+#s-summary{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
+.summary-header{text-align:center;width:100%;max-width:1200px;margin-bottom:32px}
+.summary-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700}
+.summary-title span{color:var(--primary)}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;width:100%;max-width:1200px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.sum-card img{width:100%;height:120px;object-fit:cover;opacity:.6}
+.sum-body{padding:12px}
+.sum-num{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.sum-name{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.sum-bars{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.sum-bar-row{display:flex;flex-direction:column;gap:2px}
+.sum-bar-track{background:#27272a;border-radius:4px;height:8px;overflow:hidden}
+.sum-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.fill-left{background:var(--primary-dim)}
+.fill-right{background:#0891b2}
+.sum-bar-info{font-size:.7rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+
+<!-- WAITING -->
+<div class="screen active" id="s-waiting">
+  <div class="ring-wrap">
+    <div class="pulse-ring"></div>
+    <div class="inner-ring"></div>
+  </div>
+  <div class="wait-logo">Mandela<br><span>Effekt</span></div>
+  <p class="wait-sub">Warte auf den Admin…</p>
+</div>
+
+<!-- VOTING -->
+<div class="screen" id="s-voting">
+  <div class="vote-header">
+    <div class="pair-counter" id="v-counter">Beispiel 1 von 20</div>
+    <h1 class="vote-title" id="v-title">Titel</h1>
+    <p class="vote-desc" id="v-desc">Beschreibung</p>
+  </div>
+  <div class="images-grid">
+    <div class="img-card" id="card-left" onclick="castVote('left')">
+      <img id="img-left" src="" alt="Version A">
+      <div class="img-label" id="lbl-left">Version A</div>
+      <div class="voted-badge" id="badge-left" style="display:none">✓ Dein Vote</div>
+    </div>
+    <div class="img-card" id="card-right" onclick="castVote('right')">
+      <img id="img-right" src="" alt="Version B">
+      <div class="img-label" id="lbl-right">Version B</div>
+      <div class="voted-badge" id="badge-right" style="display:none">✓ Dein Vote</div>
+    </div>
+  </div>
+  <p class="vote-status" id="v-status">Klick auf das Bild, das du für das Original hältst.</p>
+  <div class="live-count">
+    <div class="live-dot"></div>
+    <span id="live-count-txt">0 Stimmen</span>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-results">
+  <div class="result-header">
+    <div class="pair-counter" id="r-counter">Beispiel 1 von 20</div>
+    <h2 class="result-title" id="r-title">Auswertung</h2>
+    <p class="result-sub" id="r-desc"></p>
+  </div>
+  <div class="result-imgs">
+    <div class="result-card">
+      <img id="r-img-left" src="" alt="">
+      <div class="result-overlay">
+        <div class="result-pct" id="r-pct-left">0%</div>
+        <div class="result-votes" id="r-votes-left">0 Stimmen</div>
+        <div class="result-lbl" id="r-lbl-left"></div>
+      </div>
+    </div>
+    <div class="result-card">
+      <img id="r-img-right" src="" alt="">
+      <div class="result-overlay">
+        <div class="result-pct" id="r-pct-right">0%</div>
+        <div class="result-votes" id="r-votes-right">0 Stimmen</div>
+        <div class="result-lbl" id="r-lbl-right"></div>
+      </div>
+    </div>
+  </div>
+  <div class="result-bar-wrap">
+    <div class="bar-left result-bar" id="bar-left" style="width:50%"></div>
+    <div class="bar-right result-bar" id="bar-right" style="width:50%"></div>
+  </div>
+  <p class="total-info" id="r-total">0 Stimmen insgesamt</p>
+</div>
+
+<!-- SUMMARY -->
+<div class="screen" id="s-summary">
+  <div class="summary-header">
+    <h1 class="summary-title">Gesamt<span>auswertung</span></h1>
+    <p style="color:var(--muted);margin-top:8px">Alle 20 Mandela-Effekt-Beispiele im Überblick</p>
+  </div>
+  <div class="summary-grid" id="summary-grid"></div>
+</div>
+
+<script>
+const SUPA_URL = 'https://mgvjyyzurobcffulqyia.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ndmp5eXp1cm9iY2ZmdWxxeWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDE3NDIsImV4cCI6MjEwNjM3Nzc0Mn0.PQwuSNJAohKL_l3rSS_VJZPMNnVGJYck0ccxkETbo2w';
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let sessionId = localStorage.getItem('mandela_sid');
+if (!sessionId) { sessionId = crypto.randomUUID(); localStorage.setItem('mandela_sid', sessionId); }
+
+let pairs = [], state = null, myVotes = {};
+
+async function init() {
+  const { data: p } = await sb.from('image_pairs').select('*').order('order_num');
+  pairs = p || [];
+  const { data: v } = await sb.from('votes').select('image_pair_id,voted_side').eq('session_id', sessionId);
+  (v || []).forEach(x => myVotes[x.image_pair_id] = x.voted_side);
+  const { data: st } = await sb.from('presentation_state').select('*').eq('id', 1).single();
+  applyState(st);
+
+  sb.channel('state_ch').on('postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 'presentation_state' },
+    p => applyState(p.new)
+  ).subscribe();
+
+  sb.channel('votes_ch').on('postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'votes' },
+    () => { refreshLiveCount(); refreshResultsLive(); }
+  ).subscribe();
+}
+
+function applyState(st) {
+  state = st;
+  const pair = pairs[st.current_pair_index];
+  showScreen(st.phase);
+  if (st.phase === 'voting') renderVoting(pair, st.current_pair_index);
+  if (st.phase === 'results') renderResults(pair, st.current_pair_index);
+  if (st.phase === 'summary') renderSummary();
+}
+
+function showScreen(phase) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const map = { waiting:'s-waiting', voting:'s-voting', results:'s-results', summary:'s-summary' };
+  document.getElementById(map[phase])?.classList.add('active');
+}
+
+function renderVoting(pair, idx) {
+  document.getElementById('v-counter').textContent = `Beispiel ${idx + 1} von ${pairs.length}`;
+  document.getElementById('v-title').textContent = pair.title;
+  document.getElementById('v-desc').textContent = pair.description;
+  document.getElementById('img-left').src = pair.image_left_url;
+  document.getElementById('img-right').src = pair.image_right_url;
+  document.getElementById('lbl-left').textContent = pair.left_label;
+  document.getElementById('lbl-right').textContent = pair.right_label;
+  const myVote = myVotes[pair.id];
+  ['left','right'].forEach(side => {
+    const card = document.getElementById(`card-${side}`);
+    const badge = document.getElementById(`badge-${side}`);
+    card.className = 'img-card';
+    badge.style.display = 'none';
+    if (myVote) {
+      card.classList.add('disabled');
+      if (myVote === side) { card.classList.add('selected'); badge.style.display = 'block'; }
+      else card.classList.add('other');
+    }
+  });
+  document.getElementById('v-status').textContent = myVote ? 'Du hast bereits abgestimmt.' : 'Klick auf das Bild, das du für das Original hältst.';
+  refreshLiveCount();
+}
+
+async function refreshLiveCount() {
+  if (!state || state.phase !== 'voting') return;
+  const pair = pairs[state.current_pair_index];
+  const { count } = await sb.from('votes').select('id', { count: 'exact', head: true }).eq('image_pair_id', pair.id);
+  document.getElementById('live-count-txt').textContent = `${count || 0} Stimmen`;
+}
+
+async function castVote(side) {
+  const pair = pairs[state.current_pair_index];
+  if (myVotes[pair.id]) return;
+  const { error } = await sb.from('votes').insert({ session_id: sessionId, image_pair_id: pair.id, voted_side: side });
+  if (!error) { myVotes[pair.id] = side; renderVoting(pair, state.current_pair_index); }
+}
+
+let resultsInterval = null;
+async function renderResults(pair, idx) {
+  clearInterval(resultsInterval);
+  document.getElementById('r-counter').textContent = `Beispiel ${idx + 1} von ${pairs.length}`;
+  document.getElementById('r-title').textContent = pair.title;
+  document.getElementById('r-desc').textContent = pair.description;
+  document.getElementById('r-img-left').src = pair.image_left_url;
+  document.getElementById('r-img-right').src = pair.image_right_url;
+  document.getElementById('r-lbl-left').textContent = pair.left_label;
+  document.getElementById('r-lbl-right').textContent = pair.right_label;
+  await updateResultBars(pair.id);
+}
+
+async function refreshResultsLive() {
+  if (!state || state.phase !== 'results') return;
+  const pair = pairs[state.current_pair_index];
+  await updateResultBars(pair.id);
+}
+
+async function updateResultBars(pairId) {
+  const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pairId);
+  const total = data?.length || 0;
+  const left = data?.filter(v => v.voted_side === 'left').length || 0;
+  const right = total - left;
+  const lp = total ? Math.round(left / total * 100) : 50;
+  const rp = 100 - lp;
+  document.getElementById('r-pct-left').textContent = `${lp}%`;
+  document.getElementById('r-votes-left').textContent = `${left} Stimmen`;
+  document.getElementById('r-pct-right').textContent = `${rp}%`;
+  document.getElementById('r-votes-right').textContent = `${right} Stimmen`;
+  document.getElementById('bar-left').style.width = `${lp}%`;
+  document.getElementById('bar-right').style.width = `${rp}%`;
+  document.getElementById('r-total').textContent = `${total} Stimmen insgesamt`;
+}
+
+async function renderSummary() {
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = '';
+  for (const pair of pairs) {
+    const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pair.id);
+    const total = data?.length || 0;
+    const left = data?.filter(v => v.voted_side === 'left').length || 0;
+    const right = total - left;
+    const lp = total ? Math.round(left / total * 100) : 0;
+    const rp = 100 - lp;
+    grid.innerHTML += `
+    <div class="sum-card">
+      <img src="${pair.image_left_url}" alt="">
+      <div class="sum-body">
+        <div class="sum-num"># ${pair.order_num}</div>
+        <div class="sum-name">${pair.title}</div>
+        <div class="sum-bars">
+          <div class="sum-bar-row">
+            <div class="sum-bar-track"><div class="sum-bar-fill fill-left" style="width:${lp}%"></div></div>
+            <div class="sum-bar-info">${pair.left_label}: ${lp}%</div>
+          </div>
+          <div class="sum-bar-row">
+            <div class="sum-bar-track"><div class="sum-bar-fill fill-right" style="width:${rp}%"></div></div>
+            <div class="sum-bar-info">${pair.right_label}: ${rp}%</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
