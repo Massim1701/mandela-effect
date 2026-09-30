@@ -30,36 +30,39 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .ring-wrap{position:relative;width:120px;height:120px;margin:40px auto}
 
 /* VOTING */
-#s-voting{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
-.vote-header{text-align:center;width:100%;max-width:900px;margin-bottom:20px}
+#s-voting{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.vote-header{text-align:center;width:100%;max-width:1000px;margin-bottom:16px}
 .pair-counter{color:var(--primary);font-size:.9rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
-.vote-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin:8px 0}
-.vote-desc{color:var(--muted);font-size:1rem}
-.vote-img-wrap{position:relative;width:100%;max-width:900px;border-radius:20px;overflow:hidden;cursor:pointer;border:3px solid var(--border);transition:all .3s ease}
-.vote-img-wrap:hover:not(.voted){border-color:var(--primary);box-shadow:0 0 40px rgba(168,85,247,.3)}
-.vote-img-wrap.voted{cursor:default;border-color:var(--green)}
-.vote-img-wrap img{width:100%;max-height:500px;object-fit:cover;display:block}
-.vote-count-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.vote-count-big{font-size:clamp(4rem,12vw,8rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.8)}
-.vote-count-label{font-size:1rem;color:rgba(255,255,255,.8);font-weight:500;text-shadow:0 2px 8px rgba(0,0,0,.8)}
-.click-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);backdrop-filter:blur(8px);color:#fff;padding:10px 24px;border-radius:999px;font-size:.9rem;font-weight:600;white-space:nowrap}
-.voted-check{position:absolute;top:16px;right:16px;background:var(--green);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;display:none}
-.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite;display:inline-block}
+.vote-title{font-size:clamp(1.3rem,3vw,2rem);font-weight:700;margin:6px 0}
+.vote-desc{color:var(--muted);font-size:.95rem}
+.vote-img-wrap{position:relative;width:100%;max-width:1000px;border-radius:20px;overflow:hidden;border:3px solid var(--border)}
+.vote-img-wrap img{width:100%;max-height:480px;object-fit:contain;display:block;background:#fff}
+.vote-zone{position:absolute;top:0;bottom:0;width:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .2s;gap:8px}
+.vote-zone.left-zone{left:0}
+.vote-zone.right-zone{right:0}
+.vote-zone:hover:not(.disabled){background:rgba(168,85,247,.18)}
+.vote-zone.chosen{background:rgba(168,85,247,.25)}
+.vote-zone.not-chosen{background:rgba(0,0,0,.35)}
+.vote-zone.disabled{cursor:default}
+.zone-count{font-size:clamp(3rem,10vw,6rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 20px rgba(0,0,0,.9);pointer-events:none}
+.zone-label{font-size:.9rem;color:rgba(255,255,255,.85);font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.8);pointer-events:none;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:999px}
+.vote-hint{margin-top:12px;color:var(--muted);font-size:.9rem;text-align:center}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite;display:inline-block;margin-right:4px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
 /* RESULTS */
-#s-results{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
-.result-header{text-align:center;width:100%;max-width:900px;margin-bottom:20px}
-.result-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin:8px 0}
-.result-sub{color:var(--muted)}
-.result-img-wrap{position:relative;width:100%;max-width:900px;border-radius:20px;overflow:hidden;border:3px solid var(--green)}
-.result-img-wrap img{width:100%;max-height:460px;object-fit:cover;display:block}
-.result-stats-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
-.r-stat-big{font-size:clamp(3rem,10vw,6rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.8)}
-.r-stat-label{font-size:1.1rem;color:rgba(255,255,255,.9);margin-top:8px;font-weight:500;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)}
-.r-stat-sub{font-size:.9rem;color:rgba(255,255,255,.6);margin-top:4px}
-.r-bar-wrap{width:80%;max-width:500px;background:rgba(255,255,255,.2);border-radius:8px;height:12px;overflow:hidden;margin-top:20px}
-.r-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),#ec4899);border-radius:8px;transition:width 1.2s ease}
+#s-results{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.result-header{text-align:center;width:100%;max-width:1000px;margin-bottom:16px}
+.result-title{font-size:clamp(1.3rem,3vw,2rem);font-weight:700;margin:6px 0}
+.result-sub{color:var(--muted);font-size:.95rem}
+.result-img-wrap{position:relative;width:100%;max-width:1000px;border-radius:20px;overflow:hidden;border:3px solid var(--green)}
+.result-img-wrap img{width:100%;max-height:480px;object-fit:contain;display:block;background:#fff}
+.r-zone{position:absolute;top:0;bottom:0;width:50%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%)}
+.r-zone.left-zone{left:0}
+.r-zone.right-zone{right:0}
+.r-pct{font-size:clamp(2.5rem,8vw,5rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 20px rgba(0,0,0,.9)}
+.r-votes{font-size:.85rem;color:rgba(255,255,255,.75);margin-top:4px}
+.r-total{margin-top:12px;color:var(--muted);font-size:.9rem;text-align:center}
 
 /* SUMMARY */
 #s-summary{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
@@ -93,25 +96,28 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
   <p class="wait-sub">Warte auf den Admin…</p>
 </div>
 
-<!-- VOTING: Bild 1 -->
+<!-- VOTING: Bild 1 mit Links/Rechts Klickzonen -->
 <div class="screen" id="s-voting">
   <div class="vote-header">
     <div class="pair-counter" id="v-counter">Beispiel 1 von 20</div>
     <h1 class="vote-title" id="v-title">Titel</h1>
     <p class="vote-desc" id="v-desc">Beschreibung</p>
   </div>
-  <div class="vote-img-wrap" id="vote-wrap" onclick="castVote()">
+  <div class="vote-img-wrap" id="vote-wrap">
     <img id="img-vote" src="" alt="Voting Bild">
-    <div class="vote-count-overlay">
-      <div class="vote-count-big" id="vote-count-num">0</div>
-      <div class="vote-count-label"><span class="live-dot"></span> Klicks</div>
+    <div class="vote-zone left-zone" id="zone-left" onclick="castVote('left')">
+      <div class="zone-count" id="count-left">0</div>
+      <div class="zone-label" id="zlbl-left">← So kannte ich es</div>
     </div>
-    <div class="click-hint" id="click-hint">Klick, wenn du das so kanntest!</div>
-    <div class="voted-check" id="voted-check">✓</div>
+    <div class="vote-zone right-zone" id="zone-right" onclick="castVote('right')">
+      <div class="zone-count" id="count-right">0</div>
+      <div class="zone-label" id="zlbl-right">So kannte ich es →</div>
+    </div>
   </div>
+  <p class="vote-hint" id="vote-hint"><span class="live-dot"></span> Klick auf die Seite, die du in Erinnerung hattest</p>
 </div>
 
-<!-- RESULTS: Bild 2 mit Auswertung -->
+<!-- RESULTS: Bild 2 mit Links/Rechts Auswertung -->
 <div class="screen" id="s-results">
   <div class="result-header">
     <div class="pair-counter" id="r-counter">Beispiel 1 von 20</div>
@@ -120,13 +126,16 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
   </div>
   <div class="result-img-wrap">
     <img id="r-img" src="" alt="Auflösungs-Bild">
-    <div class="result-stats-overlay">
-      <div class="r-stat-big" id="r-pct">0%</div>
-      <div class="r-stat-label" id="r-label">hatten diese falsche Erinnerung</div>
-      <div class="r-stat-sub" id="r-total">von 0 Teilnehmern</div>
-      <div class="r-bar-wrap"><div class="r-bar-fill" id="r-bar" style="width:0%"></div></div>
+    <div class="r-zone left-zone">
+      <div class="r-pct" id="r-pct-left">0%</div>
+      <div class="r-votes" id="r-votes-left">0 Klicks</div>
+    </div>
+    <div class="r-zone right-zone">
+      <div class="r-pct" id="r-pct-right">0%</div>
+      <div class="r-votes" id="r-votes-right">0 Klicks</div>
     </div>
   </div>
+  <p class="r-total" id="r-total">0 Klicks insgesamt</p>
 </div>
 
 <!-- SUMMARY -->
@@ -187,26 +196,36 @@ function renderVoting(pair, idx) {
   document.getElementById('v-title').textContent = pair.title;
   document.getElementById('v-desc').textContent = pair.description;
   document.getElementById('img-vote').src = pair.image_left_url;
-  const hasClicked = !!myVotes[pair.id];
-  const wrap = document.getElementById('vote-wrap');
-  wrap.className = 'vote-img-wrap' + (hasClicked ? ' voted' : '');
-  document.getElementById('click-hint').textContent = hasClicked ? '✓ Du hast geklickt!' : 'Klick, wenn du das so kanntest!';
-  document.getElementById('voted-check').style.display = hasClicked ? 'flex' : 'none';
-  refreshLiveCount();
+  const myVote = myVotes[pair.id];
+  const zL = document.getElementById('zone-left');
+  const zR = document.getElementById('zone-right');
+  zL.className = 'vote-zone left-zone';
+  zR.className = 'vote-zone right-zone';
+  if (myVote) {
+    zL.classList.add(myVote === 'left' ? 'chosen' : 'not-chosen', 'disabled');
+    zR.classList.add(myVote === 'right' ? 'chosen' : 'not-chosen', 'disabled');
+    document.getElementById('vote-hint').textContent = '✓ Dein Klick wurde gezählt';
+  } else {
+    document.getElementById('vote-hint').innerHTML = '<span class="live-dot"></span> Klick auf die Seite, die du in Erinnerung hattest';
+  }
+  refreshLiveCounts();
 }
 
-async function refreshLiveCount() {
+async function refreshLiveCounts() {
   if (!state || state.phase !== 'voting') return;
   const pair = pairs[state.current_pair_index];
-  const { count } = await sb.from('votes').select('id', { count: 'exact', head: true }).eq('image_pair_id', pair.id);
-  document.getElementById('vote-count-num').textContent = count || 0;
+  const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pair.id);
+  const left = data?.filter(v => v.voted_side === 'left').length || 0;
+  const right = data?.filter(v => v.voted_side === 'right').length || 0;
+  document.getElementById('count-left').textContent = left;
+  document.getElementById('count-right').textContent = right;
 }
 
-async function castVote() {
+async function castVote(side) {
   const pair = pairs[state.current_pair_index];
   if (myVotes[pair.id]) return;
-  const { error } = await sb.from('votes').insert({ session_id: sessionId, image_pair_id: pair.id, voted_side: 'left' });
-  if (!error) { myVotes[pair.id] = 'left'; renderVoting(pair, state.current_pair_index); }
+  const { error } = await sb.from('votes').insert({ session_id: sessionId, image_pair_id: pair.id, voted_side: side });
+  if (!error) { myVotes[pair.id] = side; renderVoting(pair, state.current_pair_index); }
 }
 
 async function renderResults(pair, idx) {
@@ -224,12 +243,17 @@ async function refreshResultsLive() {
 }
 
 async function updateResultStats(pairId) {
-  const { count: total } = await sb.from('votes').select('id', { count: 'exact', head: true }).eq('image_pair_id', pairId);
-  const pct = total ? Math.round(total / 30 * 100) : 0;
-  document.getElementById('r-pct').textContent = `${pct}%`;
-  document.getElementById('r-label').textContent = 'hatten diese falsche Erinnerung';
-  document.getElementById('r-total').textContent = `${total || 0} von 30 Teilnehmern`;
-  document.getElementById('r-bar').style.width = `${pct}%`;
+  const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pairId);
+  const total = data?.length || 0;
+  const left = data?.filter(v => v.voted_side === 'left').length || 0;
+  const right = total - left;
+  const lp = total ? Math.round(left / total * 100) : 0;
+  const rp = 100 - lp;
+  document.getElementById('r-pct-left').textContent = `${lp}%`;
+  document.getElementById('r-votes-left').textContent = `${left} Klicks`;
+  document.getElementById('r-pct-right').textContent = `${rp}%`;
+  document.getElementById('r-votes-right').textContent = `${right} Klicks`;
+  document.getElementById('r-total').textContent = `${total} Klicks insgesamt`;
 }
 
 async function renderSummary() {
