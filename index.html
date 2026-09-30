@@ -61,6 +61,9 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .result-pct{font-size:2.5rem;font-weight:700;color:#fff}
 .result-votes{font-size:.9rem;color:var(--muted)}
 .result-lbl{font-size:.95rem;font-weight:600;color:#fff;margin-top:4px}
+.correct-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7rem;line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6));display:none}
+.result-card.correct{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.4)}
+.result-card.wrong{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);opacity:.7}
 .result-bar-wrap{width:100%;max-width:900px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;height:48px;position:relative}
 .result-bar{height:100%;transition:width 1s ease;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
 .bar-left{background:linear-gradient(90deg,#7c3aed,#a855f7);position:absolute;left:0;top:0;bottom:0}
@@ -133,16 +136,18 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
     <p class="result-sub" id="r-desc"></p>
   </div>
   <div class="result-imgs">
-    <div class="result-card">
+    <div class="result-card" id="r-card-left">
       <img id="r-img-left" src="" alt="">
+      <div class="correct-badge" id="r-badge-left"></div>
       <div class="result-overlay">
         <div class="result-pct" id="r-pct-left">0%</div>
         <div class="result-votes" id="r-votes-left">0 Stimmen</div>
         <div class="result-lbl" id="r-lbl-left"></div>
       </div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r-card-right">
       <img id="r-img-right" src="" alt="">
+      <div class="correct-badge" id="r-badge-right"></div>
       <div class="result-overlay">
         <div class="result-pct" id="r-pct-right">0%</div>
         <div class="result-votes" id="r-votes-right">0 Stimmen</div>
@@ -258,6 +263,21 @@ async function renderResults(pair, idx) {
   document.getElementById('r-img-right').src = pair.image_right_url;
   document.getElementById('r-lbl-left').textContent = pair.left_label;
   document.getElementById('r-lbl-right').textContent = pair.right_label;
+
+  // Correct/wrong badges
+  const cardL = document.getElementById('r-card-left');
+  const cardR = document.getElementById('r-card-right');
+  const badgeL = document.getElementById('r-badge-left');
+  const badgeR = document.getElementById('r-badge-right');
+  cardL.className = 'result-card'; cardR.className = 'result-card';
+  badgeL.style.display = 'none'; badgeR.style.display = 'none';
+  if (pair.correct_side === 'left') {
+    cardL.classList.add('correct'); badgeL.textContent = '✅'; badgeL.style.display = 'block';
+    cardR.classList.add('wrong');   badgeR.textContent = '❌'; badgeR.style.display = 'block';
+  } else if (pair.correct_side === 'right') {
+    cardR.classList.add('correct'); badgeR.textContent = '✅'; badgeR.style.display = 'block';
+    cardL.classList.add('wrong');   badgeL.textContent = '❌'; badgeL.style.display = 'block';
+  }
   await updateResultBars(pair.id);
 }
 

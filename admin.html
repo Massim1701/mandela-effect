@@ -137,15 +137,16 @@ input:focus{border-color:var(--primary)}
         <div class="pair-title" id="d-title">–</div>
         <div class="pair-desc" id="d-desc">–</div>
         <div class="pair-imgs">
-          <div class="thumb">
+          <div class="thumb" id="d-thumb-left">
             <img id="d-img-left" src="https://placehold.co/400x280/18181b/3f3f46?text=Bild+A" alt="">
             <div class="thumb-label" id="d-lbl-left">Version A</div>
           </div>
-          <div class="thumb">
+          <div class="thumb" id="d-thumb-right">
             <img id="d-img-right" src="https://placehold.co/400x280/18181b/3f3f46?text=Bild+B" alt="">
             <div class="thumb-label" id="d-lbl-right">Version B</div>
           </div>
         </div>
+        <div style="margin-top:12px;font-size:.8rem;color:var(--muted)" id="d-correct-hint"></div>
       </div>
 
       <div class="controls">
@@ -277,6 +278,12 @@ function applyState(st) {
   document.getElementById('d-lbl-right').textContent = pair.right_label;
   document.getElementById('d-left-lbl').textContent = pair.left_label;
   document.getElementById('d-right-lbl').textContent = pair.right_label;
+  const hint = document.getElementById('d-correct-hint');
+  if (pair.correct_side === 'left') hint.innerHTML = '✅ Richtig: <strong>' + pair.left_label + '</strong> (links)';
+  else if (pair.correct_side === 'right') hint.innerHTML = '✅ Richtig: <strong>' + pair.right_label + '</strong> (rechts)';
+  else hint.textContent = '';
+  document.getElementById('d-thumb-left').style.border = pair.correct_side === 'left' ? '2px solid var(--green)' : '2px solid var(--border)';
+  document.getElementById('d-thumb-right').style.border = pair.correct_side === 'right' ? '2px solid var(--green)' : '2px solid var(--border)';
 
   const phase = st.phase;
   const badges = {waiting:'badge-waiting ● Wartend',voting:'badge-voting ● Abstimmung läuft',results:'badge-results ● Auswertung',summary:'badge-summary ● Gesamtauswertung'};
