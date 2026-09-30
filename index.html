@@ -30,45 +30,36 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
 .ring-wrap{position:relative;width:120px;height:120px;margin:40px auto}
 
 /* VOTING */
-#s-voting{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
-.vote-header{text-align:center;width:100%;max-width:1200px;margin-bottom:24px}
+#s-voting{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.vote-header{text-align:center;width:100%;max-width:900px;margin-bottom:20px}
 .pair-counter{color:var(--primary);font-size:.9rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
 .vote-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin:8px 0}
 .vote-desc{color:var(--muted);font-size:1rem}
-.images-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:1200px;flex:1}
-.img-card{background:var(--card);border:2px solid var(--border);border-radius:16px;cursor:pointer;overflow:hidden;transition:all .2s ease;position:relative}
-.img-card:hover:not(.voted):not(.disabled){border-color:var(--primary);transform:translateY(-4px);box-shadow:0 8px 40px rgba(168,85,247,.3)}
-.img-card.selected{border-color:var(--primary);box-shadow:0 0 0 4px rgba(168,85,247,.3)}
-.img-card.other{opacity:.5;transform:none}
-.img-card.disabled{cursor:default}
-.img-card img{width:100%;height:380px;object-fit:cover;display:block}
-.img-label{padding:16px;font-size:1rem;font-weight:600;text-align:center}
-.voted-badge{position:absolute;top:12px;right:12px;background:var(--primary);color:#fff;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:999px}
-.vote-status{margin-top:16px;color:var(--muted);text-align:center;font-size:.95rem}
-.live-count{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:8px 16px;border-radius:999px;margin-top:8px}
-.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite}
+.vote-img-wrap{position:relative;width:100%;max-width:900px;border-radius:20px;overflow:hidden;cursor:pointer;border:3px solid var(--border);transition:all .3s ease}
+.vote-img-wrap:hover:not(.voted){border-color:var(--primary);box-shadow:0 0 40px rgba(168,85,247,.3)}
+.vote-img-wrap.voted{cursor:default;border-color:var(--green)}
+.vote-img-wrap img{width:100%;max-height:500px;object-fit:cover;display:block}
+.vote-count-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.vote-count-big{font-size:clamp(4rem,12vw,8rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.8)}
+.vote-count-label{font-size:1rem;color:rgba(255,255,255,.8);font-weight:500;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.click-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);backdrop-filter:blur(8px);color:#fff;padding:10px 24px;border-radius:999px;font-size:.9rem;font-weight:600;white-space:nowrap}
+.voted-check{position:absolute;top:16px;right:16px;background:var(--green);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;display:none}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite;display:inline-block}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
 /* RESULTS */
-#s-results{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
-.result-header{text-align:center;width:100%;max-width:900px;margin-bottom:32px}
+#s-results{background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.result-header{text-align:center;width:100%;max-width:900px;margin-bottom:20px}
 .result-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin:8px 0}
 .result-sub{color:var(--muted)}
-.result-imgs{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:900px;margin-bottom:24px}
-.result-card{background:var(--card);border:2px solid var(--border);border-radius:16px;overflow:hidden;position:relative}
-.result-card img{width:100%;height:280px;object-fit:cover;display:block;opacity:.7}
-.result-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 60%)}
-.result-pct{font-size:2.5rem;font-weight:700;color:#fff}
-.result-votes{font-size:.9rem;color:var(--muted)}
-.result-lbl{font-size:.95rem;font-weight:600;color:#fff;margin-top:4px}
-.correct-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7rem;line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6));display:none}
-.result-card.correct{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.4)}
-.result-card.wrong{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.3);opacity:.7}
-.result-bar-wrap{width:100%;max-width:900px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;height:48px;position:relative}
-.result-bar{height:100%;transition:width 1s ease;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
-.bar-left{background:linear-gradient(90deg,#7c3aed,#a855f7);position:absolute;left:0;top:0;bottom:0}
-.bar-right{background:linear-gradient(90deg,#0891b2,#06b6d4);position:absolute;right:0;top:0;bottom:0}
-.total-info{margin-top:16px;color:var(--muted);text-align:center;font-size:.9rem}
+.result-img-wrap{position:relative;width:100%;max-width:900px;border-radius:20px;overflow:hidden;border:3px solid var(--green)}
+.result-img-wrap img{width:100%;max-height:460px;object-fit:cover;display:block}
+.result-stats-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.r-stat-big{font-size:clamp(3rem,10vw,6rem);font-weight:700;color:#fff;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.8)}
+.r-stat-label{font-size:1.1rem;color:rgba(255,255,255,.9);margin-top:8px;font-weight:500;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.r-stat-sub{font-size:.9rem;color:rgba(255,255,255,.6);margin-top:4px}
+.r-bar-wrap{width:80%;max-width:500px;background:rgba(255,255,255,.2);border-radius:8px;height:12px;overflow:hidden;margin-top:20px}
+.r-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),#ec4899);border-radius:8px;transition:width 1.2s ease}
 
 /* SUMMARY */
 #s-summary{background:var(--bg);justify-content:flex-start;padding:24px;overflow-y:auto}
@@ -102,64 +93,40 @@ body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-ser
   <p class="wait-sub">Warte auf den Admin…</p>
 </div>
 
-<!-- VOTING -->
+<!-- VOTING: Bild 1 -->
 <div class="screen" id="s-voting">
   <div class="vote-header">
     <div class="pair-counter" id="v-counter">Beispiel 1 von 20</div>
     <h1 class="vote-title" id="v-title">Titel</h1>
     <p class="vote-desc" id="v-desc">Beschreibung</p>
   </div>
-  <div class="images-grid">
-    <div class="img-card" id="card-left" onclick="castVote('left')">
-      <img id="img-left" src="" alt="Version A">
-      <div class="img-label" id="lbl-left">Version A</div>
-      <div class="voted-badge" id="badge-left" style="display:none">✓ Dein Vote</div>
+  <div class="vote-img-wrap" id="vote-wrap" onclick="castVote()">
+    <img id="img-vote" src="" alt="Voting Bild">
+    <div class="vote-count-overlay">
+      <div class="vote-count-big" id="vote-count-num">0</div>
+      <div class="vote-count-label"><span class="live-dot"></span> Klicks</div>
     </div>
-    <div class="img-card" id="card-right" onclick="castVote('right')">
-      <img id="img-right" src="" alt="Version B">
-      <div class="img-label" id="lbl-right">Version B</div>
-      <div class="voted-badge" id="badge-right" style="display:none">✓ Dein Vote</div>
-    </div>
-  </div>
-  <p class="vote-status" id="v-status">Klick auf das Bild, das du für das Original hältst.</p>
-  <div class="live-count">
-    <div class="live-dot"></div>
-    <span id="live-count-txt">0 Stimmen</span>
+    <div class="click-hint" id="click-hint">Klick, wenn du das so kanntest!</div>
+    <div class="voted-check" id="voted-check">✓</div>
   </div>
 </div>
 
-<!-- RESULTS -->
+<!-- RESULTS: Bild 2 mit Auswertung -->
 <div class="screen" id="s-results">
   <div class="result-header">
     <div class="pair-counter" id="r-counter">Beispiel 1 von 20</div>
-    <h2 class="result-title" id="r-title">Auswertung</h2>
+    <h2 class="result-title" id="r-title">Auflösung</h2>
     <p class="result-sub" id="r-desc"></p>
   </div>
-  <div class="result-imgs">
-    <div class="result-card" id="r-card-left">
-      <img id="r-img-left" src="" alt="">
-      <div class="correct-badge" id="r-badge-left"></div>
-      <div class="result-overlay">
-        <div class="result-pct" id="r-pct-left">0%</div>
-        <div class="result-votes" id="r-votes-left">0 Stimmen</div>
-        <div class="result-lbl" id="r-lbl-left"></div>
-      </div>
-    </div>
-    <div class="result-card" id="r-card-right">
-      <img id="r-img-right" src="" alt="">
-      <div class="correct-badge" id="r-badge-right"></div>
-      <div class="result-overlay">
-        <div class="result-pct" id="r-pct-right">0%</div>
-        <div class="result-votes" id="r-votes-right">0 Stimmen</div>
-        <div class="result-lbl" id="r-lbl-right"></div>
-      </div>
+  <div class="result-img-wrap">
+    <img id="r-img" src="" alt="Auflösungs-Bild">
+    <div class="result-stats-overlay">
+      <div class="r-stat-big" id="r-pct">0%</div>
+      <div class="r-stat-label" id="r-label">hatten diese falsche Erinnerung</div>
+      <div class="r-stat-sub" id="r-total">von 0 Teilnehmern</div>
+      <div class="r-bar-wrap"><div class="r-bar-fill" id="r-bar" style="width:0%"></div></div>
     </div>
   </div>
-  <div class="result-bar-wrap">
-    <div class="bar-left result-bar" id="bar-left" style="width:50%"></div>
-    <div class="bar-right result-bar" id="bar-right" style="width:50%"></div>
-  </div>
-  <p class="total-info" id="r-total">0 Stimmen insgesamt</p>
 </div>
 
 <!-- SUMMARY -->
@@ -219,23 +186,12 @@ function renderVoting(pair, idx) {
   document.getElementById('v-counter').textContent = `Beispiel ${idx + 1} von ${pairs.length}`;
   document.getElementById('v-title').textContent = pair.title;
   document.getElementById('v-desc').textContent = pair.description;
-  document.getElementById('img-left').src = pair.image_left_url;
-  document.getElementById('img-right').src = pair.image_right_url;
-  document.getElementById('lbl-left').textContent = pair.left_label;
-  document.getElementById('lbl-right').textContent = pair.right_label;
-  const myVote = myVotes[pair.id];
-  ['left','right'].forEach(side => {
-    const card = document.getElementById(`card-${side}`);
-    const badge = document.getElementById(`badge-${side}`);
-    card.className = 'img-card';
-    badge.style.display = 'none';
-    if (myVote) {
-      card.classList.add('disabled');
-      if (myVote === side) { card.classList.add('selected'); badge.style.display = 'block'; }
-      else card.classList.add('other');
-    }
-  });
-  document.getElementById('v-status').textContent = myVote ? 'Du hast bereits abgestimmt.' : 'Klick auf das Bild, das du für das Original hältst.';
+  document.getElementById('img-vote').src = pair.image_left_url;
+  const hasClicked = !!myVotes[pair.id];
+  const wrap = document.getElementById('vote-wrap');
+  wrap.className = 'vote-img-wrap' + (hasClicked ? ' voted' : '');
+  document.getElementById('click-hint').textContent = hasClicked ? '✓ Du hast geklickt!' : 'Klick, wenn du das so kanntest!';
+  document.getElementById('voted-check').style.display = hasClicked ? 'flex' : 'none';
   refreshLiveCount();
 }
 
@@ -243,64 +199,37 @@ async function refreshLiveCount() {
   if (!state || state.phase !== 'voting') return;
   const pair = pairs[state.current_pair_index];
   const { count } = await sb.from('votes').select('id', { count: 'exact', head: true }).eq('image_pair_id', pair.id);
-  document.getElementById('live-count-txt').textContent = `${count || 0} Stimmen`;
+  document.getElementById('vote-count-num').textContent = count || 0;
 }
 
-async function castVote(side) {
+async function castVote() {
   const pair = pairs[state.current_pair_index];
   if (myVotes[pair.id]) return;
-  const { error } = await sb.from('votes').insert({ session_id: sessionId, image_pair_id: pair.id, voted_side: side });
-  if (!error) { myVotes[pair.id] = side; renderVoting(pair, state.current_pair_index); }
+  const { error } = await sb.from('votes').insert({ session_id: sessionId, image_pair_id: pair.id, voted_side: 'left' });
+  if (!error) { myVotes[pair.id] = 'left'; renderVoting(pair, state.current_pair_index); }
 }
 
-let resultsInterval = null;
 async function renderResults(pair, idx) {
-  clearInterval(resultsInterval);
   document.getElementById('r-counter').textContent = `Beispiel ${idx + 1} von ${pairs.length}`;
   document.getElementById('r-title').textContent = pair.title;
   document.getElementById('r-desc').textContent = pair.description;
-  document.getElementById('r-img-left').src = pair.image_left_url;
-  document.getElementById('r-img-right').src = pair.image_right_url;
-  document.getElementById('r-lbl-left').textContent = pair.left_label;
-  document.getElementById('r-lbl-right').textContent = pair.right_label;
-
-  // Correct/wrong badges
-  const cardL = document.getElementById('r-card-left');
-  const cardR = document.getElementById('r-card-right');
-  const badgeL = document.getElementById('r-badge-left');
-  const badgeR = document.getElementById('r-badge-right');
-  cardL.className = 'result-card'; cardR.className = 'result-card';
-  badgeL.style.display = 'none'; badgeR.style.display = 'none';
-  if (pair.correct_side === 'left') {
-    cardL.classList.add('correct'); badgeL.textContent = '✅'; badgeL.style.display = 'block';
-    cardR.classList.add('wrong');   badgeR.textContent = '❌'; badgeR.style.display = 'block';
-  } else if (pair.correct_side === 'right') {
-    cardR.classList.add('correct'); badgeR.textContent = '✅'; badgeR.style.display = 'block';
-    cardL.classList.add('wrong');   badgeL.textContent = '❌'; badgeL.style.display = 'block';
-  }
-  await updateResultBars(pair.id);
+  document.getElementById('r-img').src = pair.image_right_url;
+  await updateResultStats(pair.id);
 }
 
 async function refreshResultsLive() {
   if (!state || state.phase !== 'results') return;
   const pair = pairs[state.current_pair_index];
-  await updateResultBars(pair.id);
+  await updateResultStats(pair.id);
 }
 
-async function updateResultBars(pairId) {
-  const { data } = await sb.from('votes').select('voted_side').eq('image_pair_id', pairId);
-  const total = data?.length || 0;
-  const left = data?.filter(v => v.voted_side === 'left').length || 0;
-  const right = total - left;
-  const lp = total ? Math.round(left / total * 100) : 50;
-  const rp = 100 - lp;
-  document.getElementById('r-pct-left').textContent = `${lp}%`;
-  document.getElementById('r-votes-left').textContent = `${left} Stimmen`;
-  document.getElementById('r-pct-right').textContent = `${rp}%`;
-  document.getElementById('r-votes-right').textContent = `${right} Stimmen`;
-  document.getElementById('bar-left').style.width = `${lp}%`;
-  document.getElementById('bar-right').style.width = `${rp}%`;
-  document.getElementById('r-total').textContent = `${total} Stimmen insgesamt`;
+async function updateResultStats(pairId) {
+  const { count: total } = await sb.from('votes').select('id', { count: 'exact', head: true }).eq('image_pair_id', pairId);
+  const pct = total ? Math.round(total / 30 * 100) : 0;
+  document.getElementById('r-pct').textContent = `${pct}%`;
+  document.getElementById('r-label').textContent = 'hatten diese falsche Erinnerung';
+  document.getElementById('r-total').textContent = `${total || 0} von 30 Teilnehmern`;
+  document.getElementById('r-bar').style.width = `${pct}%`;
 }
 
 async function renderSummary() {
