@@ -10,9 +10,9 @@
 
 | Admin | Token |
 |-------|-------|
-| Admin 1 | `mdl-Admin-7Kp2XqNr` |
-| Admin 2 | `mdl-Admin-W4mLt8Fs` |
-| Admin 3 | `mdl-Admin-Z6hNe1Yx` |
+| Admin 1 | `mdlNews` |
+| Admin 2 | `mdlMike` |
+| Admin 3 | `mdlMassimo` |
 
 ## Bilder austauschen
 
